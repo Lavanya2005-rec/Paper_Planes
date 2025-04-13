@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FraudShield - Upload CSV</title>
+</head>
+<body>
+  <h2>Upload CSV File</h2>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".csv" required />
+    <button type="submit">Upload & Predict</button>
+  </form>
+
+  <p id="message"></p>
+
+  <script>
+    document.getElementById("uploadForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const fileInput = e.target.querySelector('input[type="file"]');
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+
+      document.getElementById("message").innerText = "Uploading...";
+
+      try {
+        const response = await fetch("http://localhost:8000/predict", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
+        document.getElementById("message").innerText =
+          result.message || result.detail || "Success!";
+        fileInput.value = ""; // clear input
+      } catch (err) {
+        console.error("Upload failed", err);
+        document.getElementById("message").innerText = "Upload failed!";
+      }
+    });
+  </script>
+</body>
+</html>
